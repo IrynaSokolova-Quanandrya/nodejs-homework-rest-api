@@ -1,7 +1,20 @@
 const express = require('express')
 const createError = require('http-errors')
-const router = express.Router()
+const Joi = require("joi")
+
 const contacts = require("../../models/contacts")
+
+const productSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email({ 
+    minDomainSegments: 2, tlds: { 
+      allow: ['com', 'net', 'ua'] 
+    } }).required(),
+  phone: Joi.number().min(7).required() 
+})
+
+const router = express.Router()
+
 
 router.get('/', async (req, res, next) => {
   try {
@@ -15,8 +28,8 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:contactId', async (req, res, next) => {
   try {
-     const {id} = req.params;
-     const result = await contacts.getContactById(id)
+     const {contactId} = req.params;
+     const result = await contacts.getContactById(contactId)
      if(!result){
        throw new createError(404, 'Not found')
      }
@@ -30,27 +43,50 @@ router.get('/:contactId', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-      const {name, email, phone } = req.body
+      const {error} = productSchema.validate(req.body);
+      if(error){
+        throw new createError(400, error.message)
+      }
+      const {name, email, phone } = req.body;
       const result = await contacts.addContact(name, email, phone)
       res.status(201).json(result)
     } catch (error) {
       next(error)
     }
-
-
-  await contacts.addContact()
-  console.log(req.body);
-  res.json({ message: 'template message' })
 })
 
 router.delete('/:contactId', async (req, res, next) => {
-  // await contacts.removeContact()
-  res.json({ message: 'template message' })
+  try {
+    const {contactId} = req.params;
+    const result = await contacts.removeContact(contactId);
+    if(!result){
+      throw new createError(404, "Not found")
+    }
+    res.json({message: "сontact deleted"})
+  } catch (error) {
+    next(error)
+  }
 })
 
 router.put('/:contactId', async (req, res, next) => {
-  // await contacts.updateContact( )
-  res.json({ message: 'template message' })
+  try {
+    const {error} = productSchema.validate(req.body);
+      if(error){
+        throw new createError(400, error.message)
+      }
+      const {contactId} = req.params;
+      const {name, email, phone } = req.body
+      console.log(req.body);
+      const result = await contacts.updateContact(contactId, name, email, phone)
+    if(!result){
+      throw new createError(404, "Not found")
+    }
+      res.json(result)
+  } catch (error) {
+    next(error)
+  }
+  
+  
 })
 
 module.exports = router
