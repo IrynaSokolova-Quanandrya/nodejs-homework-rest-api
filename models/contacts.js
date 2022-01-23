@@ -29,8 +29,10 @@ const removeContact = async (contactId) => {
     if(idx === -1){
     return null;
   }
-  const removedContact = contacts[idx]
-  contacts.splice(idx, 1)
+  // console.log('idx удаляемого контакта:', idx);
+  const removedContact = contacts[idx];
+  // console.log('removedContact:', removedContact);
+  contacts.splice(idx, 1);
   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
   return removedContact;
 }
