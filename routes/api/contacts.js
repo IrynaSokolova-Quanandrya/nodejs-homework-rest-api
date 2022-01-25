@@ -58,10 +58,7 @@ router.post('/', async (req, res, next) => {
 router.delete('/:contactId', async (req, res, next) => {
   try {
     const {contactId} = req.params;
-    console.log('contactId:', contactId);
-    const result = await contacts.removeContact();
-    // console.log('contacts.removeContact(contactId):', contacts.removeContact());
-    // console.log('result:', result);
+    const result = await contacts.removeContact(contactId);
     if(!result){
       throw new createError(404, "Not found")
     }
@@ -79,7 +76,6 @@ router.put('/:contactId', async (req, res, next) => {
       }
       const {contactId} = req.params;
       const {name, email, phone } = req.body
-      console.log(req.body);
       const result = await contacts.updateContact(contactId, name, email, phone)
     if(!result){
       throw new createError(404, "Not found")
