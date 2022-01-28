@@ -41,19 +41,19 @@ router.get('/', async (req, res, next) => {
  
 // })
 
-// router.post('/', async (req, res, next) => {
-//     try {
-//       const {error} = productSchema.validate(req.body);
-//       if(error){
-//         throw new createError(400, error.message)
-//       }
-//       const {name, email, phone } = req.body;
-//       const result = await contacts.addContact(name, email, phone)
-//       res.status(201).json(result)
-//     } catch (error) {
-//       next(error)
-//     }
-// })
+router.post('/', async (req, res, next) => {
+    try {
+      const {error} = productSchema.validate(req.body);
+      if(error){
+        throw new createError(400, error.message)
+      }
+      console.log(req.body); 
+      const result = await Contact.create(req.body)
+      res.status(201).json(result)
+    } catch (error) {
+      next(error)
+    }
+})
 
 // router.delete('/:contactId', async (req, res, next) => {
 //   try {
