@@ -53,18 +53,18 @@ router.post('/', async (req, res, next) => {
     }
 })
 
-// router.delete('/:contactId', async (req, res, next) => {
-//   try {
-//     const {contactId} = req.params;
-//     const result = await Contact.findOneAndRemove(contactId);
-//     if(!result){
-//       throw new createError(404, "Not found")
-//     }
-//     res.json({message: "сontact deleted"})
-//   } catch (error) {
-//     next(error)
-//   }
-// })
+router.delete('/:contactId', async (req, res, next) => {
+  try {
+    const {contactId} = req.params;
+    const result = await Contact.findByIdAndDelete(contactId);
+    if(!result){
+      throw new createError(404, "Not found")
+    }
+    res.json({message: "сontact deleted"})
+  } catch (error) {
+    next(error)
+  }
+})
 
 router.put('/:contactId', async (req, res, next) => {
   try {
@@ -73,7 +73,6 @@ router.put('/:contactId', async (req, res, next) => {
         throw new createError(400, error.message)
       }
       const {contactId} = req.params;
-      // const {name, email, phone } = req.body
       const result = await Contact.findByIdAndUpdate(contactId, req.body, {new:true})
     if(!result){
       throw new createError(404, "Not found")
@@ -84,4 +83,4 @@ router.put('/:contactId', async (req, res, next) => {
   }
 })
 
-module.exports = router
+module.exports = router;
