@@ -26,20 +26,19 @@ router.get('/', async (req, res, next) => {
 })
  
 
-// router.get('/:contactId', async (req, res, next) => {
-//   try {
-//      const {contactId} = req.params;
-//      const result = await contacts.getContactById(contactId)
-//      if(!result){
-//        throw new createError(404, 'Not found')
-//      }
-//      res.json(result)
-//   } catch (error) {
-//     next(error)
-//   }
- 
- 
-// })
+router.get('/:contactId', async (req, res, next) => {
+  try {
+     const {contactId} = req.params;
+     const result = await Contact.findById(contactId)
+     if(!result){
+       throw new createError(404, 'Not found')
+     }
+     res.json(result)
+  } catch (error) {
+    if(error.message.includes("Cast to ObjectId faild"))
+    next(error)
+  }
+})
 
 router.post('/', async (req, res, next) => {
     try {
@@ -47,7 +46,6 @@ router.post('/', async (req, res, next) => {
       if(error){
         throw new createError(400, error.message)
       }
-      console.log(req.body); 
       const result = await Contact.create(req.body)
       res.status(201).json(result)
     } catch (error) {
@@ -58,7 +56,7 @@ router.post('/', async (req, res, next) => {
 // router.delete('/:contactId', async (req, res, next) => {
 //   try {
 //     const {contactId} = req.params;
-//     const result = await contacts.removeContact(contactId);
+//     const result = await Contact.findOneAndRemove(contactId);
 //     if(!result){
 //       throw new createError(404, "Not found")
 //     }
@@ -68,24 +66,22 @@ router.post('/', async (req, res, next) => {
 //   }
 // })
 
-// router.put('/:contactId', async (req, res, next) => {
-//   try {
-//     const {error} = productSchema.validate(req.body);
-//       if(error){
-//         throw new createError(400, error.message)
-//       }
-//       const {contactId} = req.params;
-//       const {name, email, phone } = req.body
-//       const result = await contacts.updateContact(contactId, name, email, phone)
-//     if(!result){
-//       throw new createError(404, "Not found")
-//     }
-//       res.json(result)
-//   } catch (error) {
-//     next(error)
-//   }
-  
-  
-// })
+router.put('/:contactId', async (req, res, next) => {
+  try {
+    const {error} = productSchema.validate(req.body);
+      if(error){
+        throw new createError(400, error.message)
+      }
+      const {contactId} = req.params;
+      // const {name, email, phone } = req.body
+      const result = await Contact.findByIdAndUpdate(contactId, req.body, {new:true})
+    if(!result){
+      throw new createError(404, "Not found")
+    }
+      res.json(result)
+  } catch (error) {
+    next(error)
+  }
+})
 
 module.exports = router
