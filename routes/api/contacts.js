@@ -4,15 +4,19 @@ const Joi = require("joi")
 
 const Contact = require("../../models/contact")
 
-const productSchema = Joi.object({
+const contactSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email({ 
     minDomainSegments: 2, tlds: { 
       allow: ['com', 'net', 'ua'] 
     } }).required(),
-  phone: Joi.number().min(7).required() 
+  phone: Joi.number().min(7).required(),
+  
 })
 
+const contuctFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required()
+})
 const router = express.Router()
 
 
@@ -42,7 +46,7 @@ router.get('/:contactId', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-      const {error} = productSchema.validate(req.body);
+      const {error} = contactSchema.validate(req.body);
       if(error){
         throw new createError(400, error.message)
       }
@@ -68,12 +72,29 @@ router.delete('/:contactId', async (req, res, next) => {
 
 router.put('/:contactId', async (req, res, next) => {
   try {
-    const {error} = productSchema.validate(req.body);
+    const {error} = contactSchema.validate(req.body);
       if(error){
         throw new createError(400, error.message)
       }
       const {contactId} = req.params;
       const result = await Contact.findByIdAndUpdate(contactId, req.body, {new:true})
+    if(!result){
+      throw new createError(404, "Not found")
+    }
+      res.json(result)
+  } catch (error) {
+    next(error)
+  }
+})
+
+router.patch('/:contactId/favorite', async (req, res, next) => {
+  try {
+    const {error} = contuctFavoriteSchema.validate(req.body);
+      if(error){
+        throw new createError(400, "missing field favorite")
+      }
+      const {contactId} = req.params;
+      const result = await Contact.findByIdAndUpdate(contactId, req.body)
     if(!result){
       throw new createError(404, "Not found")
     }
