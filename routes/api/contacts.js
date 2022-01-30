@@ -14,7 +14,7 @@ const contactSchema = Joi.object({
   
 })
 
-const contuctFavoriteSchema = Joi.object({
+const contactFavoriteSchema = Joi.object({
   favorite: Joi.boolean().required()
 })
 const router = express.Router()
@@ -39,7 +39,9 @@ router.get('/:contactId', async (req, res, next) => {
      }
      res.json(result)
   } catch (error) {
-    if(error.message.includes("Cast to ObjectId faild"))
+    if(error.message.includes("Cast to ObjectId faild")){
+      error.status = 400
+    }
     next(error)
   }
 })
@@ -89,7 +91,7 @@ router.put('/:contactId', async (req, res, next) => {
 
 router.patch('/:contactId/favorite', async (req, res, next) => {
   try {
-    const {error} = contuctFavoriteSchema.validate(req.body);
+    const {error} = contactFavoriteSchema.validate(req.body);
       if(error){
         throw new createError(400, "missing field favorite")
       }
