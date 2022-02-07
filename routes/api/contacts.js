@@ -2,9 +2,8 @@ const express = require('express')
 const createError = require('http-errors')
 const mongoose = require('mongoose')
 
-const Contact = require("../../models/contact")
 const {Contact, schemas} = require('../../models/contact')
-
+const{authentication} = require('../../middlewares')
 const router = express.Router()
 
 
