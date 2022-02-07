@@ -7,9 +7,16 @@ const{authentication} = require('../../middlewares')
 const router = express.Router()
 
 
-router.get('/', async (req, res, next) => {
+router.get('/', authentication, async (req, res, next) => {
   try {
-    const result = await Contact.find()
+    const {page = 1, limit = 20} = req.query;
+    const{_id} = req.user
+    const skip = (page - 1) * limit;
+    const result = await Contact.find(
+      {owner: _id}, 
+      "-createdAt -updatedAt",
+      {skip, limit: +limit}
+      ).populate("owner", "email")
     res.json(result)
   } catch (error) {
     next(error)
@@ -33,13 +40,14 @@ router.get('/:contactId', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', authentication, async (req, res, next) => {
     try {
       const {error} = schemas.contact.validate(req.body);
       if(error){
         throw new createError(400, error.message)
       }
-      const result = await Contact.create(req.body)
+      const data = {...req.body, owner:req.user._id}
+      const result = await Contact.create(data)
       res.status(201).json(result)
     } catch (error) {
       next(error)
