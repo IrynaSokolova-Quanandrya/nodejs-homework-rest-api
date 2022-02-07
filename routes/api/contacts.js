@@ -62,6 +62,9 @@ router.post('/', async (req, res, next) => {
 router.delete('/:contactId', async (req, res, next) => {
   try {
     const {contactId} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(contactId)){
+      throw new createError(404, "Id not valid")
+    }
     const result = await Contact.findByIdAndDelete(contactId);
     if(!result){
       throw new createError(404, "Not found")
@@ -79,6 +82,9 @@ router.put('/:contactId', async (req, res, next) => {
         throw new createError(400, error.message)
       }
       const {contactId} = req.params;
+      if(!mongoose.Types.ObjectId.isValid(contactId)){
+        throw new createError(404, "Id not valid")
+      }
       const result = await Contact.findByIdAndUpdate(contactId, req.body, {new:true})
     if(!result){
       throw new createError(404, "Not found")
@@ -96,6 +102,9 @@ router.patch('/:contactId/favorite', async (req, res, next) => {
         throw new createError(400, "missing field favorite")
       }
       const {contactId} = req.params;
+      if(!mongoose.Types.ObjectId.isValid(contactId)){
+        throw new createError(404, "Id not valid")
+      }
       const result = await Contact.findByIdAndUpdate(contactId, req.body)
     if(!result){
       throw new createError(404, "Not found")
