@@ -2,8 +2,9 @@ const express = require("express")
 const createError = require("http-errors")
 const bcrypt = require('bcryptjs')
 const jwt = required("jsonwebtoken")
-const {User, schemas} = require('../../models/user')
 const { required } = require("joi")
+
+const {User, schemas} = require('../../models/user')
 const router = express.Router()
 
 const {SECRET_KEY} = process.env
