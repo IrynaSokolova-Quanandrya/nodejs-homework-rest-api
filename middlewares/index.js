@@ -1,3 +1,3 @@
-const authentication = require('./authentication')
+const authenticate = require('./authenticate')
 
-module.exports = authentication;
+module.exports = authenticate;

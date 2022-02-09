@@ -3,18 +3,19 @@ const createError = require('http-errors')
 const mongoose = require('mongoose')
 
 const {Contact, schemas} = require('../../models/contact')
-const{authentication} = require('../../middlewares')
+const{authenticate} = require('../../middlewares')
 const router = express.Router()
 
+// mongodb+srv://ira_sokolova:PZoVrUvZro7OgW3O@cluster0.81849.mongodb.net/test
 
-router.get('/', authentication, async (req, res, next) => {
-  try {
+router.get('/', authenticate, async (req, res, next) => {
+    try {
     const {page = 1, limit = 20} = req.query;
     const{_id} = req.user
     const skip = (page - 1) * limit;
     const result = await Contact.find(
       {owner: _id}, 
-      "-createdAt -updatedAt",
+      // "-createdAt -updatedAt",
       {skip, limit: +limit}
       ).populate("owner", "email")
     res.json(result)
@@ -40,7 +41,7 @@ router.get('/:contactId', async (req, res, next) => {
   }
 })
 
-router.post('/', authentication, async (req, res, next) => {
+router.post('/', authenticate, async (req, res, next) => {
     try {
       const {error} = schemas.contact.validate(req.body);
       if(error){
@@ -100,7 +101,7 @@ router.patch('/:contactId/favorite', async (req, res, next) => {
       if(!mongoose.Types.ObjectId.isValid(contactId)){
         throw new createError(404, "Id not valid")
       }
-      const result = await Contact.findByIdAndUpdate(contactId, req.body)
+      const result = await Contact.findByIdAndUpdate(contactId, req.body, { new: true })
     if(!result){
       throw new createError(404, "Not found")
     }

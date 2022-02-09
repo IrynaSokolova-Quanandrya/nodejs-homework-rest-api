@@ -2,7 +2,6 @@ const express = require("express")
 const createError = require("http-errors")
 const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
-const { required } = require("joi")
 
 const {User, schemas} = require('../../models/user')
 const router = express.Router()
@@ -20,7 +19,9 @@ router.post('/signup', async(req, res, next)=>{
         if(user){
             throw new createError(409, "Email in use");
         }
-        const result = await User.create({email, password})
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, salt);
+        await User.create({email, password: hashPassword});        
         res.status(201).json({
             "user":{
                 email,
@@ -52,16 +53,30 @@ router.post("/login", async(req, res, next)=> {
             id: user._id
         }
         const token = jwt.sign(payload, SECRET_KEY, {expiresIn: "1h"})
-        await User.findByIdAndUpdate(user._id, {token })
+        await User.findByIdAndUpdate(user._id, {token})
         res.json({
             token,
             user:{
                 email,
-                "subscription": "starter"
+                subscription: user.subscription
             }
         })
     } catch (error) {
         next(error)
     }
 })
+
+// router.get('/current', authenticate, async (req, res, next) => {
+//     const{ email, subscription} = req.user
+//     res.json({
+//         email,
+//         subscription
+//     })
+// })
+
+// router.get('/ logout', authenticate, async (req, res, next) => {
+//     const { _id } = req.user;
+//     await User.findByIdAndUpdate(_id, { token: '' });
+//     res.status(204).send()
+// })
 module.exports = router;
