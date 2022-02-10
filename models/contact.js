@@ -24,7 +24,7 @@ const contactSchema = Schema(
       }, {versionKey: false, timestamps: true}
 )
 
-const contactJoiSchema = Joi.object({
+const addContactJoiSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email({ 
     minDomainSegments: 2, tlds: { 
@@ -40,7 +40,7 @@ const contactJoiFavoriteSchema = Joi.object({
 
 const Contact = model("contact", contactSchema)
 const schemas = {
-  contact: contactJoiSchema,
+  add: addContactJoiSchema,
   favorite: contactJoiFavoriteSchema
 }
 

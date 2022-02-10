@@ -2,21 +2,23 @@ const express = require("express")
 const {BadRequest, Conflict, Unauthorized} = require("http-errors")
 const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
+require("dotenv").config();
+
 
 const {User, schemas} = require('../../models/user')
+const { authenticate } = require("../../middlewares");
+
 const router = express.Router()
 
 const {SECRET_KEY} = process.env
 
 router.post('/signup', async(req, res, next)=>{
     try {
-        console.log(req.body);
         const {error} = schemas.register.validate(req.body)
         if(error){
             throw new BadRequest(400, error.message)
         }
         const {email, password, subscription} = req.body;
-        console.log(req.body);
         const user = await User.findOne({email});
         if(user){
             throw new Conflict(409, "Email in use");
@@ -55,17 +57,17 @@ router.post("/login", async(req, res, next)=> {
         await User.findByIdAndUpdate(user._id, {token})
         res.json({
             token,
-            user:{
-                email,
-                subscription: user.subscription
-            }
+            // user:{
+            //     email,
+            //     subscription: user.subscription
+            // }
         })
     } catch (error) {
         next(error)
     }
 })
 
-router.get('/current', async (req, res, next) => {
+router.get('/current', authenticate, async (req, res, next) => {
     const{ email, subscription} = req.user
     res.json({
         email,
@@ -73,9 +75,32 @@ router.get('/current', async (req, res, next) => {
     })
 })
 
-router.get('/ logout', async (req, res, next) => {
+router.get('/ logout', authenticate, async (req, res, next) => {
     const { _id } = req.user;
     await User.findByIdAndUpdate(_id, { token: '' });
     res.status(204).send()
 })
+
+router.patch("/subscription", authenticate, async (req, res, next) => {
+    try {
+      const { error } = schemas.update.validate(req.body);
+  
+      if (error) {
+          throw new BadRequest(400, error.message)
+        };
+        const {email, subscription, id} = req.body
+      await User.findByIdAndUpdate(
+        id,
+        email,
+        subscription,
+        {new: true}
+      );
+  
+      res.json({ 
+          email, subscription 
+        });
+    } catch (error) {
+      next(error);
+    }
+  });
 module.exports = router;
