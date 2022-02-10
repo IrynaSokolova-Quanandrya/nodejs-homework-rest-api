@@ -24,7 +24,8 @@ const userSchema =Schema({
 
   const registerJoiSchema = Joi.object({
       email: Joi.string().required(),
-      password: Joi.string().min(6).required
+      password: Joi.string().min(6).required(),
+    
   })
 
   const updateJoiSubscriptionSchema = Joi.object({
@@ -32,7 +33,7 @@ const userSchema =Schema({
   });
 
   const User = model("user", userSchema);
-  
+
   const schemas = {
       register: registerJoiSchema,
       update: updateJoiSubscriptionSchema,
