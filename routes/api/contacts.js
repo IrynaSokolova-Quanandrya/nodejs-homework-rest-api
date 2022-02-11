@@ -1,5 +1,5 @@
 const express = require('express')
-const {CreateError, CreateError} = require('http-errors')
+const CreateError = require('http-errors')
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const {Contact, schemas} = require('../../models/contact')
