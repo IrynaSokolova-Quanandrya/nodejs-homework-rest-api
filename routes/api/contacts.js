@@ -1,5 +1,5 @@
 const express = require('express')
-const {BadRequest, NotFound} = require('http-errors')
+const {CreateError, CreateError} = require('http-errors')
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const {Contact, schemas} = require('../../models/contact')
@@ -26,11 +26,11 @@ router.get('/:contactId', async (req, res, next) => {
   try {
      const {contactId} = req.params;
      if(!ObjectId.isValid(contactId)){
-      throw new NotFound(404, "Id not valid")
+      throw new CreateError(404, "Id not valid")
     }
      const result = await Contact.findById(contactId)
      if(!result){
-       throw new NotFound(404, 'Not found')
+       throw new CreateError(404, 'Not found')
      }
      res.json(result)
   } catch (error) {
@@ -42,7 +42,7 @@ router.post('/', async (req, res, next) => {
     try {
       const {error} = schemas.add.validate(req.body);
       if(error){
-        throw new BadRequest(400, error.message)
+        throw new CreateError(400, error.message)
       }
       const data = {...req.body, owner:req.user._id}
       const result = await Contact.create(data)
@@ -56,14 +56,14 @@ router.delete('/:contactId', async (req, res, next) => {
   try {
     const {contactId} = req.params;
     if(!ObjectId.isValid(contactId)){
-      throw new NotFound(404, "Id not valid")
+      throw new CreateError(404, "Id not valid")
     }
     const result = await Contact.findByIdAndDelete({
       contactId,
       owner: req.user.id
     });
     if(!result){
-      throw new NotFound(404, "Not found")
+      throw new CreateError(404, "Not found")
     }
     res.json({message: "сontact deleted"})
   } catch (error) {
@@ -75,11 +75,11 @@ router.put('/:contactId', async (req, res, next) => {
   try {
     const {error} = schemas.add.validate(req.body);
       if(error){
-        throw new BadRequest(400, error.message)
+        throw new CreateError(400, error.message)
       }
       const {contactId} = req.params;
       if(!ObjectId.isValid(contactId)){
-        throw new NotFound(404, "Id not valid")
+        throw new CreateError(404, "Id not valid")
       }
       const result = await Contact.findByIdAndUpdate(
         {
@@ -90,7 +90,7 @@ router.put('/:contactId', async (req, res, next) => {
         {new:true}
         )
     if(!result){
-      throw new NotFound(404, "Not found")
+      throw new CreateError(404, "Not found")
     }
       res.json(result)
   } catch (error) {
@@ -102,11 +102,11 @@ router.patch('/:contactId/favorite', async (req, res, next) => {
   try {
     const {error} = schemas.favorite.validate(req.body);
       if(error){
-        throw new BadRequest(400, "missing field favorite")
+        throw new CreateError(400, "missing field favorite")
       }
       const {contactId} = req.params;
       if(!ObjectId.isValid(contactId)){
-        throw new NotFound(404, "Id not valid")
+        throw new CreateError(404, "Id not valid")
       }
       const result = await Contact.findByIdAndUpdate({
         contactId,
@@ -116,7 +116,7 @@ router.patch('/:contactId/favorite', async (req, res, next) => {
         , { new: true }
         )
     if(!result){
-      throw new NotFound(404, "Not found")
+      throw new CreateError(404, "Not found")
     }
       res.json(result)
   } catch (error) {
