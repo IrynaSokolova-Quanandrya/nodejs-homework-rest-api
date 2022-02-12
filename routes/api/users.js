@@ -45,11 +45,16 @@ router.post("/login", async(req, res, next)=> {
             throw new CreateError(400, error.message)
         }
         const {email, password} = req.body;
+
         const user = await User.findOne({email})
-        const compareResult = await bcrypt.compare(password, user.password);
-        if(!user || !compareResult){
-            throw new CreateError (401, "Email or password  wrong")
+            if(!user){
+                throw new CreateError(401, "Email or password  wrong")
         }
+        const compareResult = await bcrypt.compare(password, user.password);
+            if(!compareResult){
+                throw new CreateError(401, "Email or password  wrong")
+       }
+        
         const payload = {
             id: user._id
         }
