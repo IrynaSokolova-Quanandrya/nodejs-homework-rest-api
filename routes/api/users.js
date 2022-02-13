@@ -73,7 +73,6 @@ router.post("/login", async(req, res, next)=> {
 })
 
 router.get('/current', authenticate, async (req, res, next) => {
-    console.log(req.user);
     const{ email, subscription} = req.user
     res.json({
         email,

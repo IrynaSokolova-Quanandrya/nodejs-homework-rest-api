@@ -61,7 +61,6 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:contactId', async (req, res, next) => {
   try {
-    console.log(req.params);
     const {contactId} = req.params;
     if(!ObjectId.isValid(contactId)){
       throw new CreateError(404, "Id not valid")
