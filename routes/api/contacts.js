@@ -8,10 +8,11 @@ const router = express.Router()
 router.get('/', async (req, res, next) => {
     try {
     const{_id} = req.user
+    
+    const {page = 1, limit = 20} = req.query;
     if(isNaN(page) || isNaN(limit)){
       throw new CreateError(400, "Page and limits not a number")
     }
-    const {page = 1, limit = 20} = req.query;
     const skip = (page - 1) * limit;
     const result = await Contact.find(
       {owner: _id}, 
@@ -31,7 +32,10 @@ router.get('/:contactId', async (req, res, next) => {
      if(!ObjectId.isValid(contactId)){
       throw new CreateError(404, "Id not valid")
     }
-     const result = await Contact.findById(contactId)
+     const result = await Contact.findById({
+      _id: ObjectId(contactId),
+      owner: req.user.id
+     })
      if(!result){
        throw new CreateError(404, 'Not found')
      }
@@ -57,12 +61,13 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:contactId', async (req, res, next) => {
   try {
+    console.log(req.params);
     const {contactId} = req.params;
     if(!ObjectId.isValid(contactId)){
       throw new CreateError(404, "Id not valid")
     }
     const result = await Contact.findByIdAndDelete({
-      contactId,
+      _id: ObjectId(contactId),
       owner: req.user.id
     });
     if(!result){
@@ -86,7 +91,7 @@ router.put('/:contactId', async (req, res, next) => {
       }
       const result = await Contact.findByIdAndUpdate(
         {
-          contactId, 
+          _id: ObjectId(contactId), 
           owner: req.user.id
         },  
         req.body, 
@@ -112,11 +117,11 @@ router.patch('/:contactId/favorite', async (req, res, next) => {
         throw new CreateError(404, "Id not valid")
       }
       const result = await Contact.findByIdAndUpdate({
-        contactId,
+        _id: ObjectId(contactId),
         owner: req.user.id
        },
-        req.body
-        , { new: true }
+        req.body,
+        { new: true }
         )
     if(!result){
       throw new CreateError(404, "Not found")
