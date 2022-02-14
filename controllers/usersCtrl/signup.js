@@ -16,7 +16,7 @@ const signup = async(req, res, next)=>{
         }
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
-        const avatarURL = gravatar.url(email)
+        const avatarURL = gravatar.url(email, {protocol: "http"})
         await User.create({email, subscription, avatarURL, password: hashPassword});        
         res.status(201).json({
             "user":{
