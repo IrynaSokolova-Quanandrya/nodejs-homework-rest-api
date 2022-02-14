@@ -1,6 +1,6 @@
 const multer = require("multer")
 const path = require("path")
-var Jimp = require('jimp');
+var jimp = require('jimp');
 
 const tempDir = path.join(__dirname, "../", "tmp")
 
@@ -9,9 +9,10 @@ const multerConfig = multer.diskStorage({
     filename: (req, file, cb) => {
         cb(null, file.originalname)
     },
-    // limits: {
-
-    // }
+    size: (async()=>{
+        await image.resize(250, jimp.AUTO);
+    })
+    
 })
 
 const upload = multer({
