@@ -4,12 +4,15 @@ const logout = require('./logout');
 const current = require('./current');
 const subscription = require('./subscription');
 const avatars = require('./avatars');
-
+const verification = require('./verification')
+const verify = require("./verify")
 module.exports = {
     signup,
     login,
     logout,
     current,
     subscription,
-    avatars
+    avatars,
+    verification,
+    verify
 }; 
