@@ -8,7 +8,7 @@ const verification = async(req, res, next)=>{
         if(!user){
             throw new CreateError(404, "User not found");
         }
-        await User.findById(user._id, {verfy: true, verificationToken: null})
+        await User.findByIdAndUpdate(user._id, {verify: true, verificationToken: null})
         res.json({
             message: 'Verification successful'
         })
