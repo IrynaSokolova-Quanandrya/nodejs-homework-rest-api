@@ -1,6 +1,8 @@
 const CreateError = require("http-errors")
 const bcrypt = require("bcryptjs")
 const gravatar = require("gravatar")
+const {nanoid} = require("nanoid")
+const sendMail = require("../../helpers")
 const {User, schemas} = require("../../models/user")
 
 const signup = async(req, res, next)=>{
@@ -17,7 +19,14 @@ const signup = async(req, res, next)=>{
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
         const avatarURL = gravatar.url(email, {protocol: "http"})
-        await User.create({email, subscription, avatarURL, password: hashPassword});        
+        const verificationToken = nanoid();
+        await User.create({email, subscription, verificationToken, avatarURL, password: hashPassword});        
+        const mail = {
+            to: email,
+            subject: "Подтверждение",
+            html: `<a target="_blank" href='http://localhost:3000/api/users/${verificationToken}'>Click here</a>`
+          }
+        await sendMail(mail);  
         res.status(201).json({
             "user":{
                 email,
